@@ -1,22 +1,20 @@
 using UnityEngine;
-using UnityEngine.Assertions.Must;
 
 public class PerlinNoise : MonoBehaviour
 {
+    [Header("Scale")]
     [SerializeField] int xyLength;
     [SerializeField] float scale;
-
-    [SerializeField] Gradient gradient;
-
-    [SerializeField] Renderer perlinRenderer;
-
     [SerializeField] float meshOffSet;
 
+    [Header("Color")]
+    [SerializeField] Gradient gradient;
+
+    [Header("Mesh")]
+    [SerializeField] Renderer perlinRenderer;
     [SerializeField] MeshFilter mesh;
 
     float[,] noiseMap;
-
-    Vector3[] set;
 
     private void Start()
     {
@@ -81,10 +79,10 @@ public static class MeshGen
         int width = noiseMap.GetLength(0);
         int heigth = noiseMap.GetLength(1);
 
-        Vector3[] verts = new Vector3[width*heigth];
+        Vector3[] verts = new Vector3[width * heigth];
         int[] triangles = new int[(width - 1) * (heigth - 1) * 6];
-        Vector2[] uv = new Vector2[width*heigth]; 
-        
+        Vector2[] uv = new Vector2[width * heigth];
+
 
         int vertRowLength = width - 1;
 
@@ -95,7 +93,7 @@ public static class MeshGen
         {
             for (int x = 0; x < width; x++)
             {
-                verts[vertexIndex] = new Vector3(1 * x, Mathf.Lerp(0, 1, noiseMap[x,y]), 1 * -y) ;
+                verts[vertexIndex] = new Vector3(1 * x, Mathf.Lerp(0, 1, noiseMap[x, y]), 1 * -y);
                 uv[vertexIndex] = new Vector2(x / (float)width, y / (float)heigth);
 
                 if (y < heigth - 1 && x < width - 1)
