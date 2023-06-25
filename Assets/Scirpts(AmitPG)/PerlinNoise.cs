@@ -1,5 +1,5 @@
-using System.Configuration;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 
 public class PerlinNoise : MonoBehaviour
 {
@@ -23,7 +23,7 @@ public class PerlinNoise : MonoBehaviour
         noiseMap = CreateNoiseMap();
         perlinRenderer.sharedMaterial.mainTexture = DrawNoiseMap(xyLength);
         transform.localScale = new Vector3(xyLength, 1, xyLength);
-        mesh.mesh = TriangleGenerator.GenerateMesh(noiseMap, meshOffSet);
+        mesh.mesh = MeshGen.GenerateMeshData(noiseMap);
     }
 
     private void OnValidate()
@@ -73,78 +73,46 @@ public class PerlinNoise : MonoBehaviour
 
 }
 
-public static class TriangleGenerator
+public static class MeshGen
 {
-    static Vector3[] vertices;
-    static int[] triangle;
-
-    public static Mesh GenerateMesh(float[,] noiseMap, float xzOffset)
+    public static Mesh GenerateMeshData(float[,] noiseMap)
     {
-        Mesh mesh = new Mesh();
-        int xyLen = noiseMap.GetLength(0);
-
-        vertices = CreateVerts(xyLen, noiseMap, xzOffset);
-        triangle = CreateTriangle(vertices, xyLen);
-
-
-        mesh.vertices = vertices;
-        mesh.triangles = triangle;
-
-        mesh.RecalculateNormals();
-        return mesh;
-    }
-
-    static Vector3[] CreateVerts(int xyLength, float[,] noiseMap, float xzOffset)
-    {
-        Vector3[] vertices;
-        vertices = new Vector3[xyLength * xyLength];
-
         int width = noiseMap.GetLength(0);
-        int height = noiseMap.GetLength(1);
+        int heigth = noiseMap.GetLength(1);
 
-        int trianglesNumber = (xyLength - 1) * (xyLength - 1) * 6;
+        Vector3[] verts = new Vector3[width*heigth];
+        int[] triangles = new int[(width - 1) * (heigth - 1) * 6];
 
-        int vertCount = 0;
+        int vertRowLength = width - 1;
 
-        for (int y = 0; y < height; y++)
+        int vertexIndex = 0;
+        int triangleIndex = 0;
+
+        for (int y = 0; y < heigth; y++)
         {
             for (int x = 0; x < width; x++)
             {
-                // TODO : Add height according to the noise
-                vertices[vertCount] = new Vector3(xzOffset * x, 0 , xzOffset * y);
-                vertCount++;
+                verts[vertexIndex] = new Vector3(1 * x, 0, 1 * - y);
+
+                if (y < heigth - 1 && x < width - 1)
+                {
+                    triangles[triangleIndex] = vertexIndex;
+                    triangles[triangleIndex + 1] = vertexIndex + vertRowLength + 1;
+                    triangles[triangleIndex + 2] = vertexIndex + vertRowLength;
+                    triangles[triangleIndex + 3] = vertexIndex + vertRowLength + 1;
+                    triangles[triangleIndex + 4] = vertexIndex;
+                    triangles[triangleIndex + 5] = vertexIndex + 1;
+                    triangleIndex += 6;
+                }
+
+                vertexIndex++;
             }
         }
+        Mesh mesh = new Mesh();
+        mesh.vertices = verts;
+        mesh.triangles = triangles;
 
-        return vertices;
+        return mesh;
     }
-
-    static int[] CreateTriangle(Vector3[] verts, int xyLength)
-    {
-        int[] triangles = new int[(xyLength - 1) * (xyLength - 1) * 6];
-
-        int triIndex = 0;
-
-        for(int i = 0; i < verts.Length; i++)
-        {
-            if (i != 0 && i % (xyLength - 1) == 0) break;
-            if (triIndex >= triangles.Length) return triangles;
-
-            triangles[triIndex] = i;
-            triIndex++;
-            triangles[triIndex] = i + xyLength + 1;
-            triIndex++;
-            triangles[triIndex] = i + xyLength;
-            triIndex++;
-            triangles[triIndex] = i;
-            triIndex++;
-            triangles[triIndex] = i + 1;
-            triIndex++;
-            triangles[triIndex] = i + xyLength + 1;
-        }
-
-        return triangles;
-    }
-
 
 }
