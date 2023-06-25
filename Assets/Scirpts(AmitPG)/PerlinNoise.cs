@@ -88,14 +88,17 @@ public static class MeshGen
         int vertexIndex = 0;
         int triangleIndex = 0;
 
+        float lerpPos;
+
         for (int y = 0; y < heigth; y++)
         {
             for (int x = 0; x < width; x++)
             {
-                verts[vertexIndex] = new Vector3(1 * x, 0, 1 * - y);
+                verts[vertexIndex] = new Vector3(1 * x, Mathf.Lerp(0, 1000, noiseMap[x,y]), 1 * -y) ;
 
                 if (y < heigth - 1 && x < width - 1)
                 {
+                    // creates two triangles base on the current vert location and the surrounding three
                     triangles[triangleIndex] = vertexIndex;
                     triangles[triangleIndex + 1] = vertexIndex + vertRowLength + 1;
                     triangles[triangleIndex + 2] = vertexIndex + vertRowLength;
