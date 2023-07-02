@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2413054515619135171}
   - component: {fileID: 2413054515619135173}
   m_Layer: 0
-  m_Name: Card 10
+  m_Name: AkechiCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
